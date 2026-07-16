@@ -8,6 +8,9 @@ func interactionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if i.Type != discordgo.InteractionApplicationCommand {
 		return
 	}
+	if !isAdmin(s, i.GuildID, i.User.ID, i.ChannelID) {
+		return
+	}
 
 	switch i.ApplicationCommandData().Name {
 	case "ping":

@@ -25,6 +25,7 @@ func isAdmin(s *discordgo.Session, guildID, userID, channelID string) bool {
 	if err != nil {
 		userName := getUsername(s, userID)
 		sendLog(s, guildID, fmt.Sprintf("Error: failed to check permissions for user %s: %v", userName, err))
+		return false
 	}
 	return perms&discordgo.PermissionAdministrator != 0
 }
