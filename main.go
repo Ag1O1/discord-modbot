@@ -41,6 +41,8 @@ func main() {
 
 	s.AddHandler(interactionHandler)
 
+	s.AddHandler(guildCreate)
+
 	err = s.Open()
 	if err != nil {
 		fmt.Println("Error opening connection,", err)

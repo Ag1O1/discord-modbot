@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -8,7 +9,10 @@ func interactionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if i.Type != discordgo.InteractionApplicationCommand {
 		return
 	}
-	if !isAdmin(s, i.GuildID, i.User.ID, i.ChannelID) {
+	if !isAdmin(s, i.GuildID, i.Member.User.ID, i.ChannelID) {
+		return
+	}
+	if i.Member == nil {
 		return
 	}
 
@@ -38,4 +42,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	banUser(s, guildID, userID, 1)
+}
+
+func guildCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
+	err := s.RequestGuildMembers(g.ID, "", 0, "", false)
+	if err != nil {
+		fmt.Println("Failed to request guild members:", err)
+	}
 }
