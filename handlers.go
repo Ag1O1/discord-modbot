@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -42,6 +43,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	banUser(s, guildID, userID, 1)
+	if _, err := s.ChannelMessageSend(channelID, fmt.Sprintf("Banned user: %s", getUsername(s, userID))); err != nil {
+		sendLog(s, guildID, fmt.Sprintf("Failed to send ban message: Banned user: %s", getUsername(s, userID)))
+	}
+
 }
 
 func guildCreate(s *discordgo.Session, g *discordgo.GuildCreate) {
