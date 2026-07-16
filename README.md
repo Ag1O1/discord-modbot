@@ -1,6 +1,7 @@
 # Discord Mod Bot
 
-> [!Note] This project is partially inspired by honey pot
+> [!Note]
+> This project is partially inspired by honey pot
 
 ## Purpose
 
