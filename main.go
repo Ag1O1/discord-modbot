@@ -33,6 +33,9 @@ func main() {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
+	dg.Identify.Intents = discordgo.IntentsGuilds |
+		discordgo.IntentsGuildMessages |
+		discordgo.IntentsGuildMembers
 
 	dg.AddHandler(messageCreate)
 
