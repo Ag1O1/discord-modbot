@@ -11,6 +11,13 @@ func interactionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 	if !isAdmin(s, i.GuildID, i.Member.User.ID, i.ChannelID) {
+		_ = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Insufficient perms",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
 		return
 	}
 	if i.Member == nil {
