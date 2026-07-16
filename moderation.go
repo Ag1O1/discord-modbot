@@ -1,0 +1,60 @@
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/bwmarrin/discordgo"
+)
+
+func banUser(s *discordgo.Session, guildID, userID string, days int) {
+	if err := s.GuildBanCreate(guildID, userID, days); err != nil {
+		userName := getUsername(s, userID)
+		sendLog(s, guildID, fmt.Sprintf("Error: unable to ban user %s: %v", userName, err))
+		return
+	}
+	getGuildConfig(guildID).BanCount.Add(1)
+}
+
+func isAdmin(s *discordgo.Session, guildID, userID, channelID string) bool {
+	perms, err := s.State.UserChannelPermissions(userID, channelID)
+	if err != nil {
+		userName := getUsername(s, userID)
+		sendLog(s, guildID, fmt.Sprintf("Error: failed to check permissions for user %s: %v", userName, err))
+	}
+	return perms&discordgo.PermissionAdministrator != 0
+}
+
+func getUsername(s *discordgo.Session, userID string) string {
+	user, err := s.User(userID)
+	if err != nil {
+		return "Unknown"
+	}
+	return user.Username
+}
+
+func getGuildConfig(guildID string) *GuildConfig {
+	configsMu.RLock()
+	config, ok := configs[guildID]
+	configsMu.RUnlock()
+
+	if ok {
+		return config
+	}
+
+	configsMu.Lock()
+	defer configsMu.Unlock()
+
+	config, ok = configs[guildID]
+	if !ok {
+		config = &GuildConfig{}
+		configs[guildID] = config
+	}
+	return config
+}
+
+func sendLog(s *discordgo.Session, guildID, message string) {
+	if _, err := s.ChannelMessageSend(getGuildConfig(guildID).LogChannelID, message); err != nil {
+		log.Printf("Failed to send discord log: %v", err)
+	}
+}
