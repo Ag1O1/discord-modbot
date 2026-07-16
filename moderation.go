@@ -8,9 +8,13 @@ import (
 )
 
 func banUser(s *discordgo.Session, guildID, userID string, days int) {
+	userName := getUsername(s, userID)
 	if err := s.GuildBanCreate(guildID, userID, days); err != nil {
-		userName := getUsername(s, userID)
 		sendLog(s, guildID, fmt.Sprintf("Error: unable to ban user %s: %v", userName, err))
+		return
+	}
+	if err := s.GuildBanDelete(guildID, userID); err != nil {
+		sendLog(s, guildID, fmt.Sprintf("Error: unable to unban user %s: %v", userName, err))
 		return
 	}
 	getGuildConfig(guildID).BanCount.Add(1)
