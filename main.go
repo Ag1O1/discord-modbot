@@ -28,33 +28,33 @@ func main() {
 		fmt.Println("No token provided. Set the DISCORD_TOKEN environment variable.")
 		return
 	}
-	dg, err := discordgo.New("Bot " + token)
+	s, err := discordgo.New("Bot " + token)
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
-	dg.Identify.Intents = discordgo.IntentsGuilds |
+	s.Identify.Intents = discordgo.IntentsGuilds |
 		discordgo.IntentsGuildMessages |
 		discordgo.IntentsGuildMembers
 
-	dg.AddHandler(messageCreate)
+	s.AddHandler(messageCreate)
 
-	dg.AddHandler(interactionHandler)
+	s.AddHandler(interactionHandler)
 
-	err = dg.Open()
+	err = s.Open()
 	if err != nil {
 		fmt.Println("Error opening connection,", err)
 		return
 	}
 	defer func() {
-		err := dg.Close()
+		err := s.Close()
 		if err != nil {
 			fmt.Println("Error closing connection,", err)
 		}
 
 	}()
 
-	registerCommands(dg)
+	registerCommands(s)
 	fmt.Println("Bot is now running. Press CTRL+C to exit.")
 
 	select {}
