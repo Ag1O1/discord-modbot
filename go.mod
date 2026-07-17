@@ -1,4 +1,4 @@
-module discord-ollama
+module discord-modbot
 
 go 1.26.3
 
