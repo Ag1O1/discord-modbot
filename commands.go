@@ -78,6 +78,10 @@ func handleConfig(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		case "count-channel":
 			channel := option.ChannelValue(s)
 			config.BanCountChannelID = channel.ID
+			if _, err := s.ChannelMessageSend(config.BanCountChannelID, fmt.Sprintf("Ban count: %v", config.BanCount.Load())); err != nil {
+				sendLog(s, i.GuildID, "Unable to create count message")
+				return
+			}
 			fmt.Fprintf(&msg, "Set channel to put count message to %s\n", channel.Name)
 		}
 	}
