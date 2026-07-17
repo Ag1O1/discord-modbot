@@ -37,7 +37,7 @@ var commands = []*discordgo.ApplicationCommand{
 			{
 				Type:        discordgo.ApplicationCommandOptionInteger,
 				Name:        "ban-counter-value",
-				Description: "overrides the value of the ban counter",
+				Description: "Overwrites the value of the ban counter",
 			},
 		},
 	},
@@ -86,8 +86,10 @@ func handleConfig(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			updateCounter(s, 0, i.GuildID)
 			fmt.Fprintf(&msg, "Set channel to put count message to %s\n", channel.Name)
 		case "ban-counter-value":
-			config.BanCount.Store(uint32(option.IntValue()))
+			num := uint32(option.IntValue())
+			config.BanCount.Store(num)
 			updateCounter(s, 0, i.GuildID)
+			fmt.Fprintf(&msg, "Overwrote count number to: %v", num)
 		}
 	}
 
