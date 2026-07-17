@@ -1,0 +1,42 @@
+name: Deploy project
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.4'
+
+      - name: Build
+        run: go build -o bin/discord-modbot .
+      - name: Copy binary to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "bin/discord-modbot"
+          target: "/tmp/deploy"
+      - name: Copy and restart bot
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo systemctl stop discord-bot
+            sudo cp /tmp/deploy/bin/discord-modbot /opt/discord-modbot/discord-modbot
+            sudo chown discord-modbot:discord-modbot /opt/discord-modbot/discord-modbot
+            sudo systemctl restart discord-bot
+
+
+
+
+
