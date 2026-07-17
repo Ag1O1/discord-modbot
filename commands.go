@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -28,6 +29,11 @@ var commands = []*discordgo.ApplicationCommand{
 				Name:        "log-channel",
 				Description: "Set the log channel",
 			},
+			{
+				Type:        discordgo.ApplicationCommandOptionChannel,
+				Name:        "count-channel",
+				Description: "Set the channel where the counter appers",
+			},
 		},
 	},
 }
@@ -47,7 +53,7 @@ func handlePing(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	respond(s, i, "Pinging...")
 	apiLatency := time.Since(start)
 	_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-		Content: new(fmt.Sprintf("Pong!\nGateway latency:%v\nAPI latency:%v", gatewayLatency, apiLatency)),
+		Content: new(fmt.Sprintf("POOOONG!!!!\nGateway latency:%v\nAPI latency:%v", gatewayLatency, apiLatency)),
 	})
 	if err != nil {
 		fmt.Println("Failed to edit message", i.ApplicationCommandData().Name)
@@ -56,20 +62,23 @@ func handlePing(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 func handleConfig(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	data := i.ApplicationCommandData()
-	option := data.Options[0]
-	var msg string
+	config := getGuildConfig(i.GuildID)
+	var msg strings.Builder
 
-	switch option.Name {
-	case "channel-to-monitor":
-		channel := option.ChannelValue(s)
-		getGuildConfig(i.GuildID).ChannelToMonitor = channel.ID
-		msg = fmt.Sprintf("Set channel to monitor to %s", channel.Name)
-	case "log-channel":
-		channel := option.ChannelValue(s)
-		getGuildConfig(i.GuildID).LogChannelID = channel.ID
-		msg = fmt.Sprintf("Set log channel to %s", channel.Name)
+	for _, option := range data.Options {
+		switch option.Name {
+		case "channel-to-monitor":
+			channel := option.ChannelValue(s)
+			config.ChannelToMonitor = channel.ID
+			fmt.Fprintf(&msg, "Set channel to monitor to %s\n", channel.Name)
+		case "log-channel":
+			channel := option.ChannelValue(s)
+			config.LogChannelID = channel.ID
+			fmt.Fprintf(&msg, "Set channel to monitor to %s\n", channel.Name)
+		}
 	}
-	respond(s, i, msg)
+
+	respond(s, i, msg.String())
 	saveConfig()
 }
 
