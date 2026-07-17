@@ -53,7 +53,7 @@ func handlePing(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	respond(s, i, "Pinging...")
 	apiLatency := time.Since(start)
 	_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-		Content: new(fmt.Sprintf("POOOONG!!!!\nGateway latency:%v\nAPI latency:%v", gatewayLatency, apiLatency)),
+		Content: new(fmt.Sprintf("Pong!\nGateway latency:%v\nAPI latency:%v", gatewayLatency, apiLatency)),
 	})
 	if err != nil {
 		fmt.Println("Failed to edit message", i.ApplicationCommandData().Name)
