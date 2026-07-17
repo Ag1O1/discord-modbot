@@ -72,14 +72,14 @@ func updateCounter(s *discordgo.Session, value uint32, guildID string) {
 		return
 	}
 	if config.BanCountMessageID == "" {
-		if countMessage, err := s.ChannelMessageSend(config.BanCountChannelID, fmt.Sprintf("# DO NOT TALK IN THIS CHANNEL\nIf you do you will be softbanned!\nSoftbans: %v", config.BanCount.Load())); err != nil {
+		if countMessage, err := s.ChannelMessageSend(config.BanCountChannelID, fmt.Sprintf("# DO NOT TALK IN THIS CHANNEL\n## If you do you will be softbanned!\nSoftbans: %v", config.BanCount.Load())); err != nil {
 			sendLog(s, guildID, "Unable to create count message")
 		} else {
 			config.BanCountMessageID = countMessage.ID
 		}
 		return
 	}
-	if _, err := s.ChannelMessageEdit(config.BanCountChannelID, config.BanCountMessageID, fmt.Sprintf("# DO NOT TALK IN THIS CHANNEL\nIf you do you will be softbanned!\nSoftbans: %v", config.BanCount.Load())); err != nil {
+	if _, err := s.ChannelMessageEdit(config.BanCountChannelID, config.BanCountMessageID, fmt.Sprintf("# DO NOT TALK IN THIS CHANNEL\n## If you do you will be softbanned!\nSoftbans: %v", config.BanCount.Load())); err != nil {
 		sendLog(s, guildID, "Unable to edit count message")
 	}
 }
