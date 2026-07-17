@@ -75,6 +75,10 @@ func handleConfig(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			channel := option.ChannelValue(s)
 			config.LogChannelID = channel.ID
 			fmt.Fprintf(&msg, "Set channel to monitor to %s\n", channel.Name)
+		case "count-channel":
+			channel := option.ChannelValue(s)
+			config.BanCountChannelID = channel.ID
+			fmt.Fprintf(&msg, "Set channel to put count message to %s\n", channel.Name)
 		}
 	}
 

@@ -17,7 +17,7 @@ func banUser(s *discordgo.Session, guildID, userID string, days int) {
 		sendLog(s, guildID, fmt.Sprintf("Error: unable to unban user %s: %v", userName, err))
 		return
 	}
-	getGuildConfig(guildID).BanCount.Add(1)
+	updateCounter(s, guildID)
 }
 
 func isAdmin(s *discordgo.Session, guildID, userID, channelID string) bool {
@@ -66,6 +66,17 @@ func sendLog(s *discordgo.Session, guildID, message string) {
 func updateCounter(s *discordgo.Session, guildID string) {
 	config := getGuildConfig(guildID)
 	config.BanCount.Add(1)
+
+	if config.BanCountChannelID == "" {
+		sendLog(s, guildID, "Ban count channel ID not set")
+		return
+	}
+	if config.BanCountMessageID == "" {
+		if _, err := s.ChannelMessageSend(config.BanCountChannelID, "Ban count: 0"); err != nil {
+			sendLog(s, guildID, "Unable to create count message")
+			return
+		}
+	}
 	if _, err := s.ChannelMessageEdit(config.BanCountChannelID, config.BanCountMessageID, fmt.Sprintf("Ban count: %v", config.BanCount.Load())); err != nil {
 		sendLog(s, guildID, "Unable to edit count message")
 	}
