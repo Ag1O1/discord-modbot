@@ -63,3 +63,10 @@ func sendLog(s *discordgo.Session, guildID, message string) {
 		log.Printf("Failed to send discord log: %v", err)
 	}
 }
+func updateCounter(s *discordgo.Session, guildID string) {
+	config := getGuildConfig(guildID)
+	config.BanCount.Add(1)
+	if _, err := s.ChannelMessageEdit(config.BanCountChannelID, config.BanCountMessageID, fmt.Sprintf("Ban count: %v", config.BanCount.Load())); err != nil {
+		sendLog(s, guildID, "Unable to edit count message")
+	}
+}
