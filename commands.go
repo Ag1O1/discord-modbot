@@ -34,6 +34,11 @@ var commands = []*discordgo.ApplicationCommand{
 				Name:        "count-channel",
 				Description: "Set the channel where the counter appers",
 			},
+			{
+				Type:        discordgo.ApplicationCommandOptionInteger,
+				Name:        "ban-counter-value",
+				Description: "overrides the value of the ban counter",
+			},
 		},
 	},
 }
@@ -78,13 +83,11 @@ func handleConfig(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		case "count-channel":
 			channel := option.ChannelValue(s)
 			config.BanCountChannelID = channel.ID
-			if countMessage, err := s.ChannelMessageSend(config.BanCountChannelID, fmt.Sprintf("Ban count: %v", config.BanCount.Load())); err != nil {
-				sendLog(s, i.GuildID, "Unable to create count message")
-				return
-			} else {
-				config.BanCountMessageID = countMessage.ID
-			}
+			updateCounter(s, 0, i.GuildID)
 			fmt.Fprintf(&msg, "Set channel to put count message to %s\n", channel.Name)
+		case "ban-counter-value":
+			config.BanCount.Store(uint32(option.IntValue()))
+			updateCounter(s, uint32(option.IntValue()), i.GuildID)
 		}
 	}
 
