@@ -87,7 +87,7 @@ func handleConfig(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			fmt.Fprintf(&msg, "Set channel to put count message to %s\n", channel.Name)
 		case "ban-counter-value":
 			config.BanCount.Store(uint32(option.IntValue()))
-			updateCounter(s, uint32(option.IntValue()), i.GuildID)
+			updateCounter(s, 0, i.GuildID)
 		}
 	}
 
