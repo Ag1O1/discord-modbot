@@ -72,9 +72,11 @@ func updateCounter(s *discordgo.Session, guildID string) {
 		return
 	}
 	if config.BanCountMessageID == "" {
-		if _, err := s.ChannelMessageSend(config.BanCountChannelID, "Ban count: 0"); err != nil {
+		if countMessage, err := s.ChannelMessageSend(config.BanCountChannelID, "Ban count: 0"); err != nil {
 			sendLog(s, guildID, "Unable to create count message")
 			return
+		} else {
+			config.BanCountMessageID = countMessage.ID
 		}
 	}
 	if _, err := s.ChannelMessageEdit(config.BanCountChannelID, config.BanCountMessageID, fmt.Sprintf("Ban count: %v", config.BanCount.Load())); err != nil {
